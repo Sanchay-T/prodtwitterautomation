@@ -37,7 +37,3 @@ var/
 .idea/
 .vscode/
 *.swp
-*.swo
-
-# Excel files (if you don't want to include test data)
-*.xlsx 
