@@ -49,6 +49,9 @@ class TweetTracker:
         self.save_excel()
 
 def format_tweet_content(tweet):
+    # Convert tweet to string if it's not already
+    tweet = str(tweet) if tweet is not None else ""
+    
     # Split the tweet into lines
     lines = tweet.split("\n")
     formatted_lines = []
@@ -87,8 +90,18 @@ def tweet_loop(tweet_tracker):
 
     for index, row in pending_tweets.iterrows():
         try:
+            # Skip if tweet content is None or NaN
+            if pd.isna(row['Unnamed: 0']):
+                logging.warning(f"Skipping row {index}: Empty tweet content")
+                continue
+
             # Get and format the tweet content
             tweet_content = format_tweet_content(row['Unnamed: 0'])
+            
+            # Skip empty tweets
+            if not tweet_content.strip():
+                logging.warning(f"Skipping row {index}: Empty tweet after formatting")
+                continue
 
             print("\nPosting tweet:")
             print(tweet_content)
@@ -96,6 +109,13 @@ def tweet_loop(tweet_tracker):
 
             # Post the tweet
             response = tweet_message(tweet_content)
+            
+            # Check if there was an OAuth error
+            if "Missing required OAuth credentials" in str(response):
+                logging.error("OAuth credentials missing. Please check your .env file")
+                print("Error: OAuth credentials missing. Please check your .env file")
+                sys.exit(1)  # Exit the program if OAuth is not configured
+                
             print("Twitter API response:", response)
             
             # Mark tweet as posted
@@ -105,8 +125,8 @@ def tweet_loop(tweet_tracker):
             logging.info(f"Twitter API response: {response}")
 
         except Exception as e:
-            logging.exception("An error occurred during the tweet process")
-            print("An error occurred: {}".format(str(e)))
+            logging.exception(f"An error occurred during the tweet process for row {index}")
+            print(f"An error occurred for row {index}: {str(e)}")
             continue  # Continue to next tweet if there's an error
 
         # Wait before next tweet if there are more pending
