@@ -1,0 +1,43 @@
+# Environment variables
+.env
+.envs
+*.env
+
+# Logs
+*.log
+twitter_bot.log
+
+# Service account files
+service-account*.json
+client_secret*.json
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Excel files (if you don't want to include test data)
+*.xlsx 
