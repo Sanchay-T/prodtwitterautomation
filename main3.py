@@ -71,12 +71,8 @@ def format_tweet_content(tweet):
     return "\n".join(formatted_lines)
 
 def get_tweet_interval():
-    # Random interval between 10-20 minutes
+    # Keep random interval between 10-20 minutes
     return random.randint(600, 1200)
-
-def should_tweet():
-    # 80% chance of tweeting
-    return random.random() < 0.8
 
 def tweet_loop(tweet_tracker):
     pending_tweets = tweet_tracker.get_pending_tweets()
@@ -90,31 +86,28 @@ def tweet_loop(tweet_tracker):
     logging.info(f"Found {len(pending_tweets)} pending tweets")
 
     for index, row in pending_tweets.iterrows():
-        if should_tweet():
-            try:
-                # Get and format the tweet content
-                tweet_content = format_tweet_content(row['Unnamed: 0'])
+        try:
+            # Get and format the tweet content
+            tweet_content = format_tweet_content(row['Unnamed: 0'])
 
-                print("\nPosting tweet:")
-                print(tweet_content)
-                print("\nCharacter count: {}".format(len(tweet_content)))
+            print("\nPosting tweet:")
+            print(tweet_content)
+            print("\nCharacter count: {}".format(len(tweet_content)))
 
-                # Post the tweet
-                response = tweet_message(tweet_content)
-                print("Twitter API response:", response)
-                
-                # Mark tweet as posted
-                tweet_tracker.mark_as_posted(index)
-                
-                logging.info(f"Posted tweet: {tweet_content}")
-                logging.info(f"Twitter API response: {response}")
+            # Post the tweet
+            response = tweet_message(tweet_content)
+            print("Twitter API response:", response)
+            
+            # Mark tweet as posted
+            tweet_tracker.mark_as_posted(index)
+            
+            logging.info(f"Posted tweet: {tweet_content}")
+            logging.info(f"Twitter API response: {response}")
 
-            except Exception as e:
-                logging.exception("An error occurred during the tweet process")
-                print("An error occurred: {}".format(str(e)))
-        else:
-            print("Skipped tweeting this interval")
-            logging.info("Skipped tweeting this interval")
+        except Exception as e:
+            logging.exception("An error occurred during the tweet process")
+            print("An error occurred: {}".format(str(e)))
+            continue  # Continue to next tweet if there's an error
 
         # Wait before next tweet if there are more pending
         if index < pending_tweets.index[-1]:
